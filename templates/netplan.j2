@@ -1,0 +1,17 @@
+network:
+  version: 2
+  ethernets:
+    eno1: {}
+    eno2: {}
+    eno3:
+      match:
+        macaddress: {{ ansible_interface_macs['eno3'] | default(mac_eno3) }}
+      set-name: eno3
+      mtu: 1500
+    eno4:
+      match:
+        macaddress: {{ ansible_interface_macs['eno4'] | default(mac_eno4) }}
+      set-name: eno4
+      mtu: 1500
+    ens2f0: {}
+    ens2f1: {}

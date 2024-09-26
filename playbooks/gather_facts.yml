@@ -1,0 +1,32 @@
+---
+- hosts: vm_servers
+  become: true
+  gather_facts: true
+  tasks:
+    - name: Gather network facts
+      setup:
+        gather_subset:
+          - network
+    - name: نمایش حقایق شبکه برای اشکال‌زدایی
+      debug:
+        var: ansible_facts
+
+
+    - name: Set MAC addresses for eno3
+      set_fact:
+        mac_eno3: " {{ ansible_facts['ansible_' + ansible_interfaces[2]]['macaddress'] }}"
+
+    - name: Set MAC addresses for eno4
+      set_fact:
+        mac_eno4: "{{ ansible_facts['ansible_' + ansible_interfaces[2]]['macaddress'] }}"
+    - name: show mac adresses
+      debug:
+        msg: "MAC Addresses eno3: {{ mac_eno3 }}، MAC Adresses eno4: {{ mac_eno4 }}" 
+
+    - name: Configure network settings using template
+      template:
+        src: ../templates/netplan.j2
+        dest: /etc/netplan/00-installer-config.yaml
+
+    - name: Apply netplan configuration
+      command: netplan apply
