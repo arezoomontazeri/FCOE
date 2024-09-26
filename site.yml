@@ -5,3 +5,8 @@
   tasks:
     - name: Ping the remote hosts
       ansible.builtin.ping:
+      
+    - name: Deploy the configuration file from template
+      template:
+        src: template.j2
+        dest: /etc/myconfig.conf
