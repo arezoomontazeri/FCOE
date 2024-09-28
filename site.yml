@@ -11,3 +11,14 @@
       template:
         src: 01.fcoe-config.yml.j2
         dest: /etc/netplan/01_fcoe_config.yaml
+    - name: gather network facts
+      setup:
+        gather_subset:
+          - network 
+    - name: Show MAC addresses of interfaces
+      debug:
+        msg: >
+          {% for iface in ansible_facts['ansible_interfaces'] %}
+            {{ iface }}:
+            {{ ansible_facts['ansible_' + iface]['macaddress'] if 'macaddress' in ansible_facts['ansible_' + iface] else 'No MAC address found' }}
+          {% endfor %}
