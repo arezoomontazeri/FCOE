@@ -6,19 +6,28 @@
   tasks:
     #- name: Ping the remote hosts
      # ansible.builtin.ping:
-      
+    - name: Define interfaces dictionary
+      set_fact:
+        interfaces_dict:
+          ens8:
+            macaddress: "{{ ansible_facts['ens8']['macaddress'] }}"
+          ens9:
+            macaddress: "{{ ansible_facts['ens9']['macaddress'] }}"
+
     - name: Deploy the configuration file from template
       template:
-        src: 01.fcoe-config.yml.j2
-        dest: /etc/netplan/01_fcoe_config.yaml
-    - name: gather network facts
-      setup:
+          src: 01.fcoe-config.yml.j2
+          dest: /etc/netplan/01_fcoe_config.yaml
+    - name: Gather network facts
+      ansible.builtin.setup:
         gather_subset:
-          - network 
-    - name: Show MAC addresses of interfaces
-      debug:
-        msg: >
-          {% for iface in ansible_facts['ansible_interfaces'] %}
-            {{ iface }}:
-            {{ ansible_facts['ansible_' + iface]['macaddress'] if 'macaddress' in ansible_facts['ansible_' + iface] else 'No MAC address found' }}
-          {% endfor %}
+          - 'network'
+    - name: Gather network facts
+      ansible.builtin.setup:
+        gather_subset:
+          - network
+    - name: Find NICs MAC
+      ansible.builtin.debug:
+          msg: " interface {{ item }}'s MAC is {{ ansible_facts[item]['macaddress']|default(None) }}"
+      with_items:
+      - "{{ ansible_interfaces }}"

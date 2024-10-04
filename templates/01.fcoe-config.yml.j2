@@ -1,13 +1,24 @@
+#network:
+#  version: 2
+#  ethernets:
+#    ens8:
+#      match:
+#        macaddress: "{{ ansible_facts['ens8']['macaddress'] }}"
+#      set-name: ens8
+#      mtu: 1500
+#    ens9:
+#      match:
+#        macaddress: "{{ ansible_facts['ens9']['macaddress'] }}"
+#      set-name: ens9
+#      mtu: 1500
 network:
   version: 2
   ethernets:
-    eno3:
+    {% for interface, values in interfaces_dict.items() %}
+    {{ interface }}:
       match:
-        macaddress: 20:67:7c:08:66:71
-      set-name: eno3
+        macaddress: "{{ values.macaddress }}"
+      set-name: {{ interface }}
       mtu: 1500
-    eno4:
-      match:
-        macaddress: 20:67:7c:08:66:79
-      set-name: eno4
-      mtu: 1500
+    {% endfor %}
+
