@@ -31,3 +31,20 @@
           msg: " interface {{ item }}'s MAC is {{ ansible_facts[item]['macaddress']|default(None) }}"
       with_items:
       - "{{ ansible_interfaces }}"
+
+    - name: Apply Netplan configuration
+      command: netplan apply
+
+    - name: Load bnx2fc Kernel Module Using Command Module
+      hosts: your_target_hosts
+      become: yes
+      tasks:
+      - name: Check if bnx2fc module is loaded
+        shell: lsmod | grep -w bnx2fc
+        register: module_check
+        changed_when: false
+        failed_when: false
+
+    - name: Load bnx2fc module if not already loaded
+      command: modprobe bnx2fc
+      when: module_check.stdout == ""
